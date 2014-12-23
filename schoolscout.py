@@ -24,8 +24,10 @@ from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon
 # Initialize Qt resources from file resources.py
 import resources_rc
+
 # Import the code for the dialog
 from schoolscout_dialog import SchoolScoutDialog
+from schoolscout_upload import SchoolScoutUpload
 import os.path
 
 
@@ -60,6 +62,7 @@ class SchoolScout:
 
         # Create the dialog (after translation) and keep reference
         self.dlg = SchoolScoutDialog()
+        self.uploadDlg = SchoolScoutUpload()
 
         # Declare instance attributes
         self.actions = []
@@ -163,10 +166,15 @@ class SchoolScout:
         icon_path = ':/plugins/SchoolScout/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Schoolscout Plugin'),
+            text=self.tr(u'School/District/County Search'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Upload Selected Features'),
+            callback=self.runUpload,
+            parent=self.iface.mainWindow())
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -178,11 +186,21 @@ class SchoolScout:
 
 
     def run(self):
-        """Run method that performs all the real work"""
-        # show the dialog
+
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
+        # See if OK was pressed
+        if result:
+            # Do something useful here - delete the line containing pass and
+            # substitute with your code.
+            pass
+
+    def runUpload(self):
+
+        self.uploadDlg.show()
+        # Run the dialog event loop
+        result = self.uploadDlg.exec_()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and
