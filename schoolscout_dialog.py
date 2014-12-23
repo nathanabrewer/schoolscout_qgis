@@ -86,10 +86,103 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
 
     def loadSelectedResults(self):
         print "OK, Load Selected Results...."
-        if (len(self.listWidget.selectedItems()) > 1):
+        if (len(self.listWidget.selectedItems()) > 0):
             print self.listWidget.selectedItems()
             for index, item in enumerate(self.listWidget.selectedItems(), start=0):
                 print "looping index "+str(index)+" "+item.text()
                 print self.results[index]
+                self.loadDistricts(self.results[index]["id"])
         else:
             QMessageBox.about(self, "Nothing Selected", "You need to select at least one thing from the list")
+
+
+
+
+    # working with boundary and point data from here and below....
+
+    def getSchoolBoundariesByDistrict(self, district_id, token):
+            url = "http://ss-dev.dftz.org/qgis/district/"+str(district_id)
+            print url
+            header = {
+                'content-type': 'application/json',
+                'X-AUTH-TOKEN': token
+            }
+            
+            request = { "district_id": district_id}
+            
+            jsondata = json.dumps(request)
+            jsonresp = requests.post(url = url, data = jsondata, headers = header)
+                                 
+            if jsonresp.status_code == 200:            
+                pyresp = json.loads(jsonresp.text)         
+                return pyresp
+            else:
+                raise Exception("Web error " + str(jsonresp.status_code))
+ 
+         
+    def loadDistricts(self, district_id):
+        print "Ok, attempint web service request to get data"
+        token = "not used right now"
+        jsonresponse = self.getSchoolBoundariesByDistrict(district_id, token)
+ 
+        print "Loading "+ jsonresponse['district_name']
+
+        boundaryLayer = QgsVectorLayer("Polygon?crs=EPSG:4326", jsonresponse['district_name']+"__Boundary", 'memory')
+        pointLayer = QgsVectorLayer("Point?crs=EPSG:4326", jsonresponse['district_name']+"__Point", 'memory')
+
+        boundaryDataProvider = boundaryLayer.dataProvider()
+        boundaryDataProvider.addAttributes([ QgsField("id", QVariant.Int), QgsField("school_name", QVariant.String), QgsField("cdscode",QVariant.String),QgsField("NCESSCH",QVariant.String)])
+
+        pointDataProvider = pointLayer.dataProvider()
+        pointDataProvider.addAttributes([ QgsField("id", QVariant.Int), QgsField("school_name", QVariant.String), QgsField("cdscode",QVariant.String),QgsField("NCESSCH",QVariant.String)])
+
+        boundaryLayer.startEditing()
+        pointLayer.startEditing()
+
+
+        # Loop through school responses, create a point in the point layer, and a polygon in the boundary layer
+        count=0
+
+        for school in jsonresponse['schools']:
+            count+=1
+            
+            if school['point'] != None:  
+                outFeat = QgsFeature()    
+                outFeat.setGeometry(QgsGeometry.fromWkt(school['point']))
+
+                outFeat.setAttributes([int(school['fields']["id"]), school['fields']["school_name"], school['fields']["cdscode"], school['fields']["NCESSCH"]])
+                
+                pointLayer.addFeature(outFeat)
+            
+            if school['boundary'] != None:  
+                outFeat = QgsFeature()    
+                outFeat.setGeometry(QgsGeometry.fromWkt(school['boundary']))
+                
+                outFeat.setAttributes([int(school['fields']["id"]), school['fields']["school_name"], school['fields']["cdscode"], school['fields']["NCESSCH"]])
+                
+                boundaryLayer.addFeature(outFeat)
+            else:
+                print school['fields']['school_name']+" had None type for boundary, skipping"
+             
+
+        boundaryLayer.commitChanges()
+        pointLayer.commitChanges()
+
+
+        print pointLayer
+
+        map = QgsMapLayerRegistry.instance()
+        boundaryLayer.setLayerTransparency(50)
+
+        #trying to find a way to do the symbol level alpha/transparency
+        #properties = {'size':'5.0','color':'255,0,0,100'}
+        #symbol_layer = QgsSimpleMarkerSymbolLayerV2.create(properties)
+        #print boundaryLayer.renderer
+        #print boundaryLayer.rendererV2.symbols()
+        #boundaryLayer.rendererV2.symbols()[0].changeSymbolLayer(0,symbol_layer)
+
+
+        map.addMapLayer(boundaryLayer)
+        map.addMapLayer(pointLayer)
+
+        iface.mapCanvas().setExtent(boundaryLayer.extent())            
