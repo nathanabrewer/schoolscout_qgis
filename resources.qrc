@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/SchoolScout" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
