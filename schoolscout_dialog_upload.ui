@@ -20,9 +20,9 @@
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>470</x>
      <y>370</y>
-     <width>341</width>
+     <width>161</width>
      <height>32</height>
     </rect>
    </property>
@@ -30,16 +30,16 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+    <set>QDialogButtonBox::Cancel</set>
    </property>
   </widget>
   <widget class="QListWidget" name="selectedFeaturesListWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>80</y>
-     <width>611</width>
-     <height>192</height>
+     <y>100</y>
+     <width>621</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="selectionMode">
@@ -49,9 +49,9 @@
   <widget class="QLineEdit" name="revisionNumber">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>280</y>
-     <width>241</width>
+     <x>260</x>
+     <y>290</y>
+     <width>211</width>
      <height>24</height>
     </rect>
    </property>
@@ -60,8 +60,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
-     <width>131</width>
+     <y>290</y>
+     <width>181</width>
      <height>16</height>
     </rect>
    </property>
@@ -74,7 +74,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>441</width>
+     <width>591</width>
      <height>31</height>
     </rect>
    </property>
@@ -92,10 +92,10 @@
   <widget class="QPushButton" name="uploadNow">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>280</y>
-     <width>181</width>
-     <height>27</height>
+     <x>480</x>
+     <y>260</y>
+     <width>151</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
@@ -119,9 +119,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>330</y>
-     <width>381</width>
-     <height>71</height>
+     <y>350</y>
+     <width>461</width>
+     <height>51</height>
     </rect>
    </property>
   </widget>
@@ -129,13 +129,36 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>310</y>
-     <width>181</width>
+     <y>330</y>
+     <width>241</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
     <string>Notes to submit with these features</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>260</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Associate Fix/Changes with Ticket#</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="revisionNumber_2">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>260</y>
+     <width>211</width>
+     <height>24</height>
+    </rect>
    </property>
   </widget>
  </widget>
