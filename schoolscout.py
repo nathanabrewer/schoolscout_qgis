@@ -11,17 +11,9 @@
         email                : nathan.a.brewer@dftz.org
  ***************************************************************************/
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
 import resources_rc
 
@@ -35,17 +27,13 @@ class SchoolScout:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
-        """Constructor.
 
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
         # Save reference to the QGIS interface
         self.iface = iface
+
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
+
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
@@ -71,19 +59,8 @@ class SchoolScout:
         self.toolbar = self.iface.addToolBar(u'SchoolScout')
         self.toolbar.setObjectName(u'SchoolScout')
 
-    # noinspection PyMethodMayBeStatic
+    # translation stuff we dont need really
     def tr(self, message):
-        """Get the translation for a string using Qt translation API.
-
-        We implement this ourselves since we do not inherit QObject.
-
-        :param message: String for translation.
-        :type message: str, QString
-
-        :returns: Translated version of message.
-        :rtype: QString
-        """
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('SchoolScout', message)
 
 
@@ -160,12 +137,15 @@ class SchoolScout:
 
     def runUpload(self):
 
-        self.uploadDlg.show()
-        self.uploadDlg.lookupActive()
-        # Run the dialog event loop
-        result = self.uploadDlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        activecount = self.uploadDlg.lookupActive()
+        #if we dont have any selected features on the current layer, we don't need to display the form.
+        if ( activecount < 1):
+            QMessageBox.about(None,"Nothing Selected", "Active layer needs at least one Feature Selected to use this tool")
+        else:
+            self.uploadDlg.show()
+            result = self.uploadDlg.exec_()
+            # See if OK was pressed
+            if result:
+                # Do something useful here - delete the line containing pass and
+                # substitute with your code.
+                pass

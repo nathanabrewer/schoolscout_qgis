@@ -11,14 +11,6 @@
         email                : nathan.a.brewer@dftz.org
  ***************************************************************************/
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
 """
 
 
@@ -28,6 +20,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.utils import *
 from requests.auth import HTTPBasicAuth
+from schoolscout_webconnect import SchoolScoutWebConnect
 
 from PyQt4 import QtGui, uic
 
@@ -36,14 +29,11 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
+    
     def __init__(self, parent=None):
         """Constructor."""
         super(SchoolScoutDialog, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
+
         self.setupUi(self)
 
         self.searchType.clear()
@@ -52,14 +42,12 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
         self.searchType.addItem("Search for County", "district_name")
         self.searchPushButton.clicked.connect(self.doSearch)
         self.pushButton.clicked.connect(self.loadSelectedResults)
+    
     def doSearch(self):
-        print "doSearch()"
-        print self.searchType.currentText()
-
         searchValue = self.searchText.text()
 
-        print "searchDistrict('"+searchValue+"')"
-        searchResults = self.searchDistrict(searchValue)
+        
+        searchResults = SchoolScoutWebConnect().searchDistrict(searchValue)
         self.results = searchResults['districts']
 
         #make way for new search results
@@ -68,21 +56,7 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
             text = district["district_name"]
             self.listWidget.insertItem(index, text)
 
-    def searchDistrict(self, district_name):
-        url = "http://schoolscout.local/qgis/search/"
 
-        header = {'content-type': 'application/json'}
-        request = { "district_name": district_name}
-
-        print "running post request to "+url
-        jsondata = json.dumps(request)
-        jsonresp = requests.post(url = url, data = jsondata, headers = header)
-
-        if jsonresp.status_code == 200:
-            pyresp = json.loads(jsonresp.text)
-            return pyresp
-        else:
-            raise Exception("Web error " + str(jsonresp.status_code))
 
     def loadSelectedResults(self):
         print "OK, Load Selected Results...."
@@ -98,32 +72,15 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
 
 
 
-    # working with boundary and point data from here and below....
 
-    def getSchoolBoundariesByDistrict(self, district_id, token):
-            url = "http://ss-dev.dftz.org/qgis/district/"+str(district_id)
-            print url
-            header = {
-                'content-type': 'application/json',
-                'X-AUTH-TOKEN': token
-            }
-            
-            request = { "district_id": district_id}
-            
-            jsondata = json.dumps(request)
-            jsonresp = requests.post(url = url, data = jsondata, headers = header)
-                                 
-            if jsonresp.status_code == 200:            
-                pyresp = json.loads(jsonresp.text)         
-                return pyresp
-            else:
-                raise Exception("Web error " + str(jsonresp.status_code))
  
          
     def loadDistricts(self, district_id):
+        
         print "Ok, attempint web service request to get data"
-        token = "not used right now"
-        jsonresponse = self.getSchoolBoundariesByDistrict(district_id, token)
+        
+
+        jsonresponse = SchoolScoutWebConnect().getSchoolBoundariesByDistrict(district_id)
  
         print "Loading "+ jsonresponse['district_name']
 
