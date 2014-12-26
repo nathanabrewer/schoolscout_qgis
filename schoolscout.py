@@ -15,11 +15,13 @@
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon, QMessageBox
 # Initialize Qt resources from file resources.py
-import resources_rc
+import resources_rc, qgis
 
 # Import the code for the dialog
 from schoolscout_dialog import SchoolScoutDialog
 from schoolscout_upload import SchoolScoutUpload
+from settings import SchoolScoutSettings
+from boundary_tool import SchoolScoutBoundaryTool
 import os.path
 
 
@@ -51,6 +53,9 @@ class SchoolScout:
         # Create the dialog (after translation) and keep reference
         self.dlg = SchoolScoutDialog()
         self.uploadDlg = SchoolScoutUpload()
+        self.settingsDlg = SchoolScoutSettings()
+
+        self.boundaryTool = SchoolScoutBoundaryTool(iface.mapCanvas())
 
         # Declare instance attributes
         self.actions = []
@@ -104,16 +109,32 @@ class SchoolScout:
 
         
         self.add_action(
-            ':/plugins/SchoolScout/images/favicon.ico',
+            ':/plugins/SchoolScout/images/Magnifier.png',
             text=self.tr(u'School/District/County Search'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
         self.add_action(
-            ':/plugins/SchoolScout/icon.png',
-            text=self.tr(u'Upload Selected Features'),
+            ':/plugins/SchoolScout/images/CheckMark.png',
+            text=self.tr(u'Checkin Selected Features'),
             callback=self.runUpload,
             parent=self.iface.mainWindow())
+
+        self.add_action(
+            ':/plugins/SchoolScout/images/Tools.png',
+            text=self.tr(u'Settings'),
+            callback=self.openSettings,
+            parent=self.iface.mainWindow())
+
+        self.add_action(
+            ':/plugins/SchoolScout/images/Web.png',
+            text=self.tr(u'Activate Boundary Map Tool'),
+            callback=self.activateBoundaryMapTool,
+            parent=self.iface.mainWindow())
+
+
+    def activateBoundaryMapTool(self):
+        self.iface.mapCanvas().setMapTool(self.boundaryTool)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -135,6 +156,7 @@ class SchoolScout:
             # substitute with your code.
             pass
 
+
     def runUpload(self):
 
         activecount = self.uploadDlg.lookupActive()
@@ -149,3 +171,17 @@ class SchoolScout:
                 # Do something useful here - delete the line containing pass and
                 # substitute with your code.
                 pass
+
+    def openSettings(self):
+        
+        self.settingsDlg.show()
+        result = self.settingsDlg.exec_()
+
+        if result:
+            print "Save settings"            
+            QSettings().setValue('schoolscout/apiendpoint', self.settingsDlg.apiendpoint.text())
+            QSettings().setValue('schoolscout/apiusername', self.settingsDlg.apiusername.text())
+            QSettings().setValue('schoolscout/apitoken', self.settingsDlg.apitoken.text())
+            
+        else:
+            print "Do not save settings"

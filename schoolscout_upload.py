@@ -43,9 +43,6 @@ class SchoolScoutUpload(QtGui.QDialog, FORM_CLASS):
         #self.searchType.addItem("Search for School", "school_name")
         #self.searchType.addItem("Search for County", "district_name")
         self.uploadNow.clicked.connect(self.doUpload)
-      
-        print "OK, here we go...."
-     
 
     def doUpload(self):
         print "Ah, do the upload!"

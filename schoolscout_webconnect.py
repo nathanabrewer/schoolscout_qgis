@@ -29,12 +29,23 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class SchoolScoutWebConnect():
     
+    username = ""
     token = ""
+    apiEndpoint = ""
+
+    def __init__(self, parent=None):
+        """Constructor."""
+        settings = QSettings()
+        
+        self.apiEndpoint = settings.value("schoolscout/apiendpoint")
+        self.username = settings.value("schoolscout/apiusername")
+        self.token = settings.value("schoolscout/apitoken")
 
     def SSRequestHeader(self):
         return {'content-type': 'application/json', 'X-AUTH-TOKEN': self.token }
 
-    def SSPostRequest(self, url, payload):
+    def SSPostRequest(self, target, payload):
+        url = self.apiEndpoint+target
         jsondata = json.dumps(payload)
         jsonresp = requests.post(url = url, data = jsondata, headers = self.SSRequestHeader())
         if jsonresp.status_code == 200:
@@ -45,12 +56,16 @@ class SchoolScoutWebConnect():
             raise Exception("SSPostRequest Web Request Error " + str(jsonresp.status_code))
 
     def searchDistrict(self, district_name):
-        url = "http://schoolscout.local/qgis/search/"
+        url = "qgis/search/"
         request = { "district_name": district_name}
         return self.SSPostRequest(url, request)
       
+    def searchDistrictByCountyId(self, county_id):
+        url = "qgis/search/"
+        request = { "county_id": county_id}
+        return self.SSPostRequest(url, request)
 
     def getSchoolBoundariesByDistrict(self, district_id):
-        url = "http://ss-dev.dftz.org/qgis/district/"+str(district_id)
+        url = "qgis/district/"+str(district_id)
         request = { "district_id": district_id}
         return self.SSPostRequest(url, request)

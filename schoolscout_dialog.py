@@ -45,10 +45,13 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
     
     def doSearch(self):
         searchValue = self.searchText.text()
-
+        if (self.searchType.currentText() == "Search for District"):
+            searchResults = SchoolScoutWebConnect().searchDistrict(searchValue)
+            self.results = searchResults['districts']
+        else:
+            searchResults = SchoolScoutWebConnect().searchDistrictByCountyId(searchValue)
+            self.results = searchResults['districts']
         
-        searchResults = SchoolScoutWebConnect().searchDistrict(searchValue)
-        self.results = searchResults['districts']
 
         #make way for new search results
         self.listWidget.clear()
