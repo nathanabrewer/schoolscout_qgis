@@ -42,7 +42,7 @@ class SchoolScoutSettings(QtGui.QDialog, FORM_CLASS):
         apitoken = settings.value("schoolscout/apitoken")
 
         if(apiendpoint == None):
-            apiendpoint = "http://ss-dev.dftz.org"
+            apiendpoint = "http://ss-dev.dftz.org/gis/1.1/"
         if(apiusername == None):
             apiusername = "your_username@schoolscout.com"
         if(apitoken == None):
