@@ -20,6 +20,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.utils import *
 
+import ss_request
 
 from PyQt4 import QtGui, uic
 
@@ -51,5 +52,9 @@ class SchoolScoutSettings(QtGui.QDialog, FORM_CLASS):
         self.apiusername.setText(apiusername)
         self.apitoken.setText(apitoken)
 
+        
+    
+
+            
     
     

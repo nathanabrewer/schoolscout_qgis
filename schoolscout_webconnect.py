@@ -23,37 +23,14 @@ from requests.auth import HTTPBasicAuth
 
 from PyQt4 import QtGui, uic
 
+import schoolscout_request 
+
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'schoolscout_dialog_base.ui'))
 
 
-class SchoolScoutWebConnect():
+class SchoolScoutWebConnect(schoolscout_request.SSRequest):
     
-    username = ""
-    token = ""
-    apiEndpoint = ""
-
-    def __init__(self, parent=None):
-        """Constructor."""
-        settings = QSettings()
-        
-        self.apiEndpoint = settings.value("schoolscout/apiendpoint")
-        self.username = settings.value("schoolscout/apiusername")
-        self.token = settings.value("schoolscout/apitoken")
-
-    def SSRequestHeader(self):
-        return {'content-type': 'application/json', 'X-AUTH-TOKEN': self.token }
-
-    def SSPostRequest(self, target, payload):
-        url = self.apiEndpoint+target
-        jsondata = json.dumps(payload)
-        jsonresp = requests.post(url = url, data = jsondata, headers = self.SSRequestHeader())
-        if jsonresp.status_code == 200:
-            print "Response 200 - "+url
-            pyresp = json.loads(jsonresp.text)
-            return pyresp
-        else:
-            raise Exception("SSPostRequest Web Request Error " + str(jsonresp.status_code))
 
     def searchDistrict(self, district_name):
         url = "qgis/search/"

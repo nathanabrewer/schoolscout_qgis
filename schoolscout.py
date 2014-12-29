@@ -22,6 +22,8 @@ from schoolscout_dialog import SchoolScoutDialog
 from schoolscout_upload import SchoolScoutUpload
 from settings import SchoolScoutSettings
 from boundary_tool import SchoolScoutBoundaryTool
+from schoolscout_api_browser import SchoolScoutApiBrowser
+
 import os.path
 
 
@@ -56,6 +58,7 @@ class SchoolScout:
         self.settingsDlg = SchoolScoutSettings()
 
         self.boundaryTool = SchoolScoutBoundaryTool(iface.mapCanvas())
+        self.apiBrowser = SchoolScoutApiBrowser()
 
         # Declare instance attributes
         self.actions = []
@@ -132,6 +135,12 @@ class SchoolScout:
             callback=self.activateBoundaryMapTool,
             parent=self.iface.mainWindow())
 
+        self.add_action(
+            ':/plugins/SchoolScout/images/Info.png',
+            text=self.tr(u'API Browser'),
+            callback=self.openApiBrowser,
+            parent=self.iface.mainWindow())
+
 
     def activateBoundaryMapTool(self):
         self.iface.mapCanvas().setMapTool(self.boundaryTool)
@@ -171,6 +180,10 @@ class SchoolScout:
                 # Do something useful here - delete the line containing pass and
                 # substitute with your code.
                 pass
+
+    def openApiBrowser(self):
+        self.apiBrowser.show()
+        result = self.apiBrowser.exec_()
 
     def openSettings(self):
         

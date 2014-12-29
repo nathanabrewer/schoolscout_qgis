@@ -145,4 +145,75 @@ class SchoolScoutDialog(QtGui.QDialog, FORM_CLASS):
         map.addMapLayer(boundaryLayer)
         map.addMapLayer(pointLayer)
 
-        iface.mapCanvas().setExtent(boundaryLayer.extent())            
+        iface.mapCanvas().setExtent(boundaryLayer.extent())         
+
+
+
+    #  ...working on this...
+    #  i.e. response 
+    #   {
+    #       layerdata:
+    #        [
+    #            {   'name':'Layer1 Boundary Data',
+    #                'type': 'Polygon',
+    #                'attributes':['id', 'this','that'],
+    #                'features':[
+    #                    {
+    #                        'wkt':'POLYGON()...',
+    #                        'attributes': [0,'ok','yup']
+    #                    },
+    #                    {
+    #                        'wkt':'POLYGON()...',
+    #                        'attributes': [0,'ok','yup']
+    #                    },
+    #                    {
+    #                        'wkt':'POLYGON()...',
+    #                        'attributes': [0,'ok','yup']
+    #                    }        
+    #                ]
+    #            },
+    #            {   'name':'Layer2 Point Data',
+    #                'type': 'Point',
+    #                'attributes':['id', 'this','that'],
+    #                'features':[
+    #                    {
+    #                        'wkt':'POINT()...',
+    #                        'attributes': [0,'ok','yup']
+    #                    }
+    #                ]
+    #            }    
+    #        ]
+    #    }
+    #
+
+    def loadLayers(self, some_value):
+        map = QgsMapLayerRegistry.instance()
+        response = SchoolScoutWebConnect().getLayerResults(some_value)
+        for layerdata in response['layerdata']: 
+            self.loadLayer(layerdata)
+
+    def loadLayer(self, layerdata):
+        thisLayer = QgsVectorLayer(layerdata['type']+"Polygon?crs=EPSG:4326", layerdata['name'], 'memory')
+        dataprovider = thisLayer.dataProvider()
+        for a in layerdata['attributes']:
+            if(a['name'] == 'id'):
+                dataprovider.addAttribute( QgsField("id", QVariant.Int))
+            else:
+                dataprovider.addAttribute( QgsField(a['name'], QVariant.String))
+
+            thisLayer.startEditing()
+
+            count=0
+
+            for data in layerdata['features']:
+                count+=1
+                
+                outFeat = QgsFeature()    
+                outFeat.setGeometry(QgsGeometry.fromWkt(data['wkt']))
+                outFeat.setAttributes(data['attributes'])
+                thisLayer.addFeature(outFeat)
+                                     
+
+        thisLayer.commitChanges()    
+        thisLayer.setLayerTransparency(50)
+        map.addMapLayer(thisLayer)
