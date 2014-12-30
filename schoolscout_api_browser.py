@@ -7,13 +7,11 @@
 """
 
 
-import sys, os, json, requests, fileinput
+import sys, os, fileinput
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.utils import *
-from requests.auth import HTTPBasicAuth
-from schoolscout_webconnect import SchoolScoutWebConnect
 from PyQt4 import QtGui, uic
 import ss_request
 
@@ -28,6 +26,7 @@ class SchoolScoutApiBrowser(QtGui.QDialog, FORM_CLASS):
 
         self.setupUi(self)
 
+    def ready(self):
         self.boundaryLayer = None
 
         self.stateProvider = ss_request.StateList()

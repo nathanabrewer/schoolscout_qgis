@@ -183,6 +183,7 @@ class SchoolScout:
 
     def openApiBrowser(self):
         self.apiBrowser.show()
+        self.apiBrowser.ready()
         result = self.apiBrowser.exec_()
 
     def openSettings(self):
