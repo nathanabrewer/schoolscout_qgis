@@ -20,7 +20,6 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.utils import *
 from requests.auth import HTTPBasicAuth
-from schoolscout_webconnect import SchoolScoutWebConnect
 
 from PyQt4 import QtGui, uic
 
